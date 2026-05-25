@@ -1,696 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arcadia x Engie - Demographic & Man-Hours Dashboard</title>
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #042f2e 0%, #111827 100%);
-            --panel-bg: rgba(13, 148, 136, 0.1);
-            --panel-border: rgba(20, 184, 166, 0.2);
-            --card-bg: rgba(4, 47, 46, 0.6);
-            --card-border: rgba(20, 184, 166, 0.1);
-            --text-primary: #f2f2f2;
-            --text-secondary: #9cc2c0;
-            --accent-teal: #14b8a6;
-            --accent-bright-teal: #2dd4bf;
-            --accent-red: #f87171;
-            --accent-count: #ff9f43;
-            --shadow-glow: 0 0 30px rgba(20, 184, 166, 0.2);
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        
-        .dashboard-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--panel-border);
-            padding: 24px;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), var(--shadow-glow);
-            width: 100%;
-            max-width: 680px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(20, 184, 166, 0.2);
-            padding-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .brand-logo-frame {
-            display: flex;
-            align-items: center;
-            max-height: 80px;
-            max-width: 420px;
-            overflow: hidden;
-        }
-
-        .brand-logo-img {
-            height: 100%;
-            width: auto;
-            max-height: 80px;
-            object-fit: contain;
-            display: block;
-        }
-
-        .status-badge {
-            padding: 6px 16px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            border-radius: 30px;
-            letter-spacing: 1px;
-            border: 1px solid var(--panel-border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            background: rgba(20, 184, 166, 0.2);
-            color: var(--accent-bright-teal);
-        }
-
-        .status-badge.updating {
-            background: rgba(255, 159, 67, 0.2);
-            color: var(--accent-count);
-        }
-
-        .status-badge.holiday {
-            background: rgba(248, 113, 113, 0.15);
-            color: var(--accent-red);
-            border-color: rgba(248, 113, 113, 0.3);
-        }
-
-        .grid-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .metric-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 16px;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            box-sizing: border-box;
-            min-height: 110px;
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--accent-teal);
-        }
-
-        .card-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .time-select {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(20, 184, 166, 0.4);
-            color: var(--text-primary);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 10px;
-            font-weight: 700;
-            border-radius: 4px;
-            padding: 2px 4px;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .live-date-header {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-primary);
-            opacity: 0.95;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .inception-stamp {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--accent-bright-teal);
-            opacity: 0.8;
-            margin-bottom: 6px;
-            letter-spacing: -0.2px;
-        }
-
-        .primary-clock {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--accent-bright-teal);
-            text-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
-            letter-spacing: -0.5px;
-        }
-
-        .labor-counter {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: clamp(28px, 6vw, 44px); 
-            font-weight: 700;
-            color: var(--accent-count);
-            text-shadow: 0 0 15px rgba(255, 159, 67, 0.3);
-            line-height: 1.2;
-            margin: 5px 0;
-            letter-spacing: -1px;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .labor-counter.bump {
-            transform: scale(1.08);
-        }
-
-        .dual-inputs {
-            display: flex;
-            gap: 12px;
-        }
-
-        .input-box {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex: 1;
-        }
-
-        .input-box label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .input-box input {
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-            width: 100%;
-            padding: 10px 14px;
-            font-size: 14px;
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(20, 184, 166, 0.25);
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .input-box input:focus {
-            outline: none;
-            border-color: var(--accent-bright-teal);
-            background: rgba(15, 23, 42, 0.7);
-            box-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
-        }
-
-        .total-staff-indicator {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .slider-box {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-        }
-
-        .slider-box input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(20, 184, 166, 0.2);
-            outline: none;
-        }
-
-        .slider-box input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--accent-bright-teal);
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(45, 212, 191, 0.5);
-        }
-
-        .analytics-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 4px;
-        }
-
-        .chart-frame {
-            width: 100%;
-            height: 120px;
-            position: relative;
-        }
-
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .actions-row {
-            display: flex;
-            gap: 12px;
-            border-top: 1px solid rgba(20, 184, 166, 0.2);
-            padding-top: 16px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-            padding: 12px 20px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 12px;
-            cursor: pointer;
-            border: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            min-width: 130px;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-        }
-
-        .btn-export {
-            flex: 2;
-            background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2);
-            border: 1px solid rgba(20, 184, 166, 0.2);
-        }
-
-        .btn-export:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
-        }
-
-        .btn-reset {
-            flex: 1;
-            background: rgba(248, 113, 113, 0.1);
-            color: var(--accent-red);
-            border: 1px solid rgba(248, 113, 113, 0.2);
-        }
-
-        .btn-reset:hover {
-            background: rgba(248, 113, 113, 0.2);
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 640px) {
-            body { padding: 12px; }
-            .dashboard-panel { padding: 16px; gap: 12px; border-radius: 16px; }
-            .header-row { flex-direction: column; align-items: center; gap: 12px; padding-bottom: 12px; }
-            .brand-logo-frame { height: 55px; max-height: 55px; max-width: 100%; }
-            .grid-row { grid-template-columns: 1fr; gap: 12px; }
-            .metric-card { padding: 14px; min-height: auto; }
-            .primary-clock { font-size: 20px; }
-            .dual-inputs { flex-direction: column; gap: 10px; }
-            .actions-row { flex-direction: column; gap: 10px; padding-top: 14px; }
-            .btn { width: 100%; flex: none; padding: 14px 20px; }
-        }
-    </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <title>Arcadia x Engie - Demographic & Man-Hours Dashboard</title>
+ <link rel="preconnect" href="https://googleapis.com">
+ <link rel="preconnect" href="https://gstatic.com" crossorigin>
+ <link href="https://googleapis.com" rel="stylesheet">
+ <style>
+ :root {
+  --bg-gradient: linear-gradient(135deg, #042f2e 0%, #111827 100%);
+  --panel-bg: rgba(13, 148, 136, 0.1);
+  --panel-border: rgba(20, 184, 166, 0.2);
+  --card-bg: rgba(4, 47, 46, 0.6);
+  --card-border: rgba(20, 184, 166, 0.1);
+  --text-primary: #f2f2f2;
+  --text-secondary: #9cc2c0;
+  --accent-teal: #14b8a6;
+  --accent-bright-teal: #2dd4bf;
+  --accent-red: #f87171;
+  --accent-count: #ff9f43;
+  --shadow-glow: 0 0 30px rgba(20, 184, 166, 0.2);
+ }
+ body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+ }
+ .dashboard-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), var(--shadow-glow);
+  width: 100%;
+  max-width: 900px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+ }
+ .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(20, 184, 166, 0.2);
+  padding-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 15px;
+ }
+ .status-badge {
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 30px;
+  letter-spacing: 1px;
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: rgba(20, 184, 166, 0.2);
+  color: var(--accent-bright-teal);
+ }
+ .status-badge.holiday {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--accent-red);
+  border-color: rgba(248, 113, 113, 0.3);
+ }
+ .grid-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+ }
+ .metric-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 16px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  min-height: 110px;
+ }
+ .metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent-teal);
+ }
+ .metric-card.lost-card::before {
+  background: var(--accent-red);
+ }
+ .card-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ }
+ .time-select {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(20, 184, 166, 0.4);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 4px 8px;
+   cursor: pointer;
+  outline: none;
+ }
+ .live-date-header {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  opacity: 0.95;
+  margin-bottom: 4px;
+ }
+ .inception-stamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-bright-teal);
+  opacity: 0.8;
+  margin-bottom: 6px;
+ }
+ .primary-clock {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-bright-teal);
+  text-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
+ }
+ .labor-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px; 
+  font-weight: 700;
+  color: var(--accent-count);
+  text-shadow: 0 0 15px rgba(255, 159, 67, 0.3);
+  line-height: 1.2;
+  margin: 5px 0;
+  letter-spacing: -1px;
+ }
+ .total-staff-indicator {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+ }
+ .parameter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+ }
+ .dual-inputs {
+  display: flex;
+  gap: 12px;
+ }
+ .input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+ }
+ .input-box label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+ }
+ .input-box input {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(20, 184, 166, 0.25);
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+ }
+ .slider-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+ }
+ .slider-box input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(20, 184, 166, 0.2);
+  outline: none;
+ }
+ .slider-box input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-bright-teal);
+  cursor: pointer;
+ }
+ .actions-row {
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid rgba(20, 184, 166, 0.2);
+  padding-top: 16px;
+ }
+ .btn {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+ }
+ .btn-export {
+  flex: 2;
+  background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
+  color: white;
+ }
+ .btn-reset {
+  flex: 1;
+  background: rgba(248, 113, 113, 0.1);
+  color: var(--accent-red);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+ }
+ @media (max-width: 768px) {
+  .grid-row, .parameter-grid { grid-template-columns: 1fr; }
+ }
+ </style>
 </head>
 <body>
+ <div class="dashboard-panel">
+ <!-- Replace your header-row section with this left-aligned horizontal logo version -->
+<div class="header-row" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(20, 184, 166, 0.2); padding-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+ <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+  <!-- Large Left-Aligned Horizontal Logo -->
+  <img src="logo.png" alt="Arcadia x Engie Logo" style="width: 320px; height: auto; object-fit: contain;">
+  <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">Man-Hours Data</h2>
+ </div>
+ <div class="status-badge" id="live-status">System Active</div>
+</div>
 
-    <div class="dashboard-panel">
-        <div class="header-row">
-            <div class="brand-logo-frame">
-                <img src="logo.png" alt="Arcadia x Engie" class="brand-logo-img">
-            </div>
-            <div class="status-badge" id="live-status">System Active</div>
-        </div>
-
-        <div class="grid-row">
-            <div class="metric-card">
-                <div class="card-label">
-                    <span>Time Framework</span>
-                    <select class="time-select" id="time-filter" onchange="calculateMetrics()">
-                        <option value="LIVE" selected>LIVE WINDOW</option>
-                        <option value="MTD">MTD SUMMARY</option>
-                        <option value="YTD">YTD SUMMARY</option>
-                    </select>
-                </div>
-                <div class="live-date-header" id="current-date">-- --- ----</div>
-                <div class="inception-stamp" id="day-type-stamp">WORKING DAY</div>
-                <div class="primary-clock" id="live-clock">00:00:00 PST</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-label">Total Headcount</div>
-                <div class="labor-counter" id="total-count-display">000</div>
-                <div class="total-staff-indicator">Active Workforce</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-label">Estimated Man-Hours</div>
-                <div class="labor-counter" id="man-hours-display" style="color: var(--accent-bright-teal); text-shadow: 0 0 15px rgba(45, 212, 191, 0.3);">0h</div>
-                <div class="total-staff-indicator" id="shift-length-text">Shift Total (8h Avg)</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="card-label">Demographic Distribution</div>
-                <div class="labor-counter" id="ratio-display" style="font-size: 24px; color: var(--text-primary); text-shadow: none;">0% M / 0% F</div>
-                <div class="total-staff-indicator">Gender Balance Ratio</div>
-            </div>
-        </div>
-
-        <div class="metric-card">
-            <div class="card-label">Demographic Breakdown Parameters</div>
-            <div class="dual-inputs">
-                <div class="input-box">
-                    <label for="input-male">Male Headcount</label>
-                    <input type="number" id="input-male" min="0" value="281">
-                </div>
-                <div class="input-box">
-                    <label for="input-female">Female Headcount</label>
-                    <input type="number" id="input-female" min="0" value="298">
-                </div>
-            </div>
-        </div>
-
-        <div class="metric-card">
-            <div class="card-label">Operational Parameters</div>
-            <div class="slider-box">
-                <div class="total-staff-indicator" style="margin-top:0;">
-                    <span>Average Shift Length</span>
-                    <span id="slider-value-display" style="color: var(--accent-bright-teal);">8 Hours</span>
-                </div>
-                <input type="range" id="input-multiplier" min="1" max="24" value="8">
-            </div>
-        </div>
-
-        <div class="metric-card analytics-container">
-            <div class="card-label">Headcount Trend Over Time</div>
-            <div class="chart-frame">
-                <canvas id="analyticsChart"></canvas>
-            </div>
-        </div>
-
-        <div class="actions-row">
-            <button class="btn btn-export" id="action-export" onclick="exportMetrics()">Export Datastream</button>
-            
-        </div>
+  <div class="grid-row">
+   <div class="metric-card">
+    <div class="card-label">
+     <span>Time Framework</span>
+     <select class="time-select" id="time-filter">
+      <option value="LIVE" selected>LIVE WINDOW</option>
+      <option value="MTD">MTD SUMMARY</option>
+      <option value="YTD">YTD SUMMARY</option>
+     </select>
     </div>
-
-    <script>
-        const maleInput = document.getElementById('input-male');
-        const femaleInput = document.getElementById('input-female');
-        const multiplierInput = document.getElementById('input-multiplier');
-        const timeFilter = document.getElementById('time-filter');
-        const sliderValueDisplay = document.getElementById('slider-value-display');
-        const shiftLengthText = document.getElementById('shift-length-text');
-        const totalDisplay = document.getElementById('total-count-display');
-        const manHoursDisplay = document.getElementById('man-hours-display');
-        const ratioDisplay = document.getElementById('ratio-display');
-        const clockDisplay = document.getElementById('live-clock');
-        const dateDisplay = document.getElementById('current-date');
-        const statusBadge = document.getElementById('live-status');
-        const dayTypeStamp = document.getElementById('day-type-stamp');
-        const canvas = document.getElementById('analyticsChart');
-        const ctx = canvas.getContext('2d');
-
-        let currentRenderedValue = 0;
-        let countingAnimationRef = null;
-        let historyData = []; 
-
-        const phHolidays2026 = {
-            "1-1": "New Year's Day", "2-17": "Chinese New Year", "3-20": "Eid'l Fitr",
-            "4-2": "Maundy Thursday", "4-3": "Good Friday", "4-4": "Black Saturday",
-            "4-9": "Araw ng Kagitingan", "5-1": "Labor Day", "6-12": "Independence Day",
-            "8-21": "Ninoy Aquino Day", "8-31": "National Heroes Day", "11-1": "All Saints' Day",
-            "11-2": "All Souls' Day", "11-30": "Bonifacio Day", "12-8": "Feast of the Immaculate Conception",
-            "12-24": "Christmas Eve", "12-25": "Christmas Day", "12-30": "Rizal Day", "12-31": "Last Day of the Year"
-        };
-
-        function getWorkingDaysCount(mode) {
-            let start = new Date();
-            let end = new Date();
-            if (mode === 'MTD') {
-                start.setDate(1);
-            } else if (mode === 'YTD') {
-                start.setMonth(0, 1);
-            } else {
-                return 1;
-            }
-            let workingDays = 0;
-            let current = new Date(start);
-            while (current <= end) {
-                const day = current.getDay();
-                const key = `${current.getMonth() + 1}-${current.getDate()}`;
-                if (day !== 0 && day !== 6 && !phHolidays2026[key]) {
-                    workingDays++;
-                }
-                current.setDate(current.getDate() + 1);
-            }
-            return workingDays || 1;
-        }
-
-        function isNonWorkingDay(dateObj) {
-            const dayOfWeek = dateObj.getDay(); 
-            if (dayOfWeek === 0 || dayOfWeek === 6) return { isHoliday: true, name: "Weekend" };
-            const monthDayKey = `${dateObj.getMonth() + 1}-${dateObj.getDate()}`;
-            if (phHolidays2026[monthDayKey]) return { isHoliday: true, name: phHolidays2026[monthDayKey] };
-            return { isHoliday: false, name: "Working Day" };
-        }
-
-        function resizeCanvas() {
-            if (!canvas.offsetParent) return; 
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            drawChart();
-        }
-
-        function drawChart() {
-            const w = canvas.width / (window.devicePixelRatio || 1);
-            const h = canvas.height / (window.devicePixelRatio || 1);
-            ctx.clearRect(0, 0, w, h);
-            if (historyData.length === 0) return;
-            const maxVal = Math.max(...historyData, 100) * 1.1;
-            const minVal = Math.min(...historyData, 0) * 0.9;
-            const range = maxVal - minVal || 1;
-            ctx.beginPath();
-            historyData.forEach((val, i) => {
-                const x = (i / (historyData.length - 1)) * w;
-                const y = h - ((val - minVal) / range) * h;
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            });
-            ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
-            let areaGrd = ctx.createLinearGradient(0, 0, 0, h);
-            areaGrd.addColorStop(0, 'rgba(20, 184, 166, 0.15)');
-            areaGrd.addColorStop(1, 'rgba(20, 184, 166, 0)');
-            ctx.fillStyle = areaGrd; ctx.fill();
-            ctx.beginPath();
-            historyData.forEach((val, i) => {
-                const x = (i / (historyData.length - 1)) * w;
-                const y = h - ((val - minVal) / range) * h;
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            });
-            ctx.strokeStyle = '#2dd4bf'; ctx.lineWidth = 2.5; ctx.stroke();
-        }
-
-        function animateValue(target) {
-            if (countingAnimationRef) cancelAnimationFrame(countingAnimationRef);
-            const mode = timeFilter.value;
-            const localNow = new Date();
-            const dayCheck = isNonWorkingDay(localNow);
-            
-            if (mode === 'LIVE' && dayCheck.isHoliday) {
-                statusBadge.className = "status-badge holiday";
-                statusBadge.textContent = "Non-Working Day";
-                dayTypeStamp.textContent = dayCheck.name.toUpperCase();
-                dayTypeStamp.style.color = "var(--accent-red)";
-            } else {
-                statusBadge.className = "status-badge";
-                statusBadge.textContent = "System Active";
-                dayTypeStamp.textContent = mode === 'LIVE' ? "WORKING DAY" : `${mode} ACTIVE`;
-                dayTypeStamp.style.color = "var(--accent-bright-teal)";
-            }
-            
-            const startValue = currentRenderedValue;
-            const duration = 450; 
-            let startTime = null;
-            
-            let daysMultiplier = getWorkingDaysCount(mode);
-            if (mode === 'LIVE' && dayCheck.isHoliday) daysMultiplier = 0;
-            const mult = daysMultiplier * (parseInt(multiplierInput.value) || 8);
-
-            totalDisplay.classList.add('bump');
-            manHoursDisplay.classList.add('bump');
-
-            function updateProgress(currentTime) {
-                if (!startTime) startTime = currentTime;
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeProgress = 1 - Math.pow(1 - progress, 3);
-                
-                currentRenderedValue = Math.floor(startValue + easeProgress * (target - startValue));
-                totalDisplay.textContent = currentRenderedValue.toString().padStart(3, '0');
-                manHoursDisplay.textContent = `${(currentRenderedValue * mult).toLocaleString()}h`;
-
-                if (progress < 1) {
-                    countingAnimationRef = requestAnimationFrame(updateProgress);
-                } else {
-                    currentRenderedValue = target;
-                    totalDisplay.textContent = target.toString().padStart(3, '0');
-                    manHoursDisplay.textContent = `${(target * mult).toLocaleString()}h`;
-                    totalDisplay.classList.remove('bump');
-                    manHoursDisplay.classList.remove('bump');
-                    if (historyData.length === 0 || historyData[historyData.length - 1] !== target) {
-                        historyData.push(target);
-                        if (historyData.length > 12) historyData.shift();
-                        drawChart();
-                    }
-                }
-            }
-            countingAnimationRef = requestAnimationFrame(updateProgress);
-        }
-
-        function calculateMetrics() {
-            const maleVal = parseInt(maleInput.value) || 0;
-            const femaleVal = parseInt(femaleInput.value) || 0;
-            const absoluteTotal = maleVal + femaleVal;
-            const mult = multiplierInput.value;
-            const mode = timeFilter.value;
-
-            sliderValueDisplay.textContent = `${mult} Hour${mult > 1 ? 's' : ''}`;
-            shiftLengthText.textContent = mode === 'LIVE' ? `Shift Total (${mult}h Avg)` : `${mode} Total (${mult}h/d)`;
-
-            if (absoluteTotal > 0) {
-                const mPct = Math.round((maleVal / absoluteTotal) * 100);
-                const fPct = Math.round((femaleVal / absoluteTotal) * 100);
-                ratioDisplay.textContent = `${mPct}% M / ${fPct}% F`;
-            } else {
-                ratioDisplay.textContent = "0% M / 0% F";
-            }
-            animateValue(absoluteTotal);
-        }
-
-        function updateClockEngine() {
-            const timeObj = new Date();
-            clockDisplay.textContent = `${timeObj.getHours().toString().padStart(2, '0')}:${timeObj.getMinutes().toString().padStart(2, '0')}:${timeObj.getSeconds().toString().padStart(2, '0')} PST`;
-            dateDisplay.textContent = timeObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        }
-
-        function resetForm() {
-            maleInput.value = 0; femaleInput.value = 0; multiplierInput.value = 8;
-            timeFilter.value = 'LIVE'; calculateMetrics();
-        }
-
-        function exportMetrics() {
-            const totalHeadcount = totalDisplay.textContent;
-            const estimatedHours = manHoursDisplay.textContent;
-            const demographicRatio = ratioDisplay.textContent;
-            const maleCount = maleInput.value || 0;
-            const femaleCount = femaleInput.value || 0;
-            const shiftLength = multiplierInput.value || 8;
-            const exportDate = dateDisplay.textContent;
-            const exportTime = clockDisplay.textContent;
-            const dayType = dayTypeStamp.textContent;
-            const mode = timeFilter.value;
-
-            const csvRows = [
-                ["========================================================================="],
-                ["                   ARCADIA x ENGIE - OPERATIONS REPORT                   "],
-                ["========================================================================="],
-                [],
-                ["1. REPORT METADATA"],
-                ["-------------------------------------------------------------------------"],
-                ["Generation Date", exportDate],
-                ["Generation Time", exportTime],
-                ["Time Window Mode", mode],
-                ["Day/Timeline Status", dayType],
-                [],
-                ["2. WORKFORCE ANALYSIS SUMMARY"],
-                ["-------------------------------------------------------------------------"],
-                ["Total Dynamic Headcount", `${totalHeadcount} Active Personnel`],
-                ["Male Allocation", `${maleCount} Count`],
-                ["Female Allocation", `${femaleCount} Count`],
-                ["Workforce Balance Distribution", demographicRatio],
-                [],
-                ["3. OPERATIONAL METRICS OUTPUT"],
-                ["-------------------------------------------------------------------------"],
-                ["Baseline Shift Length Matrix", `${shiftLength} Hours Per Shift`],
-                ["Calculated Output Yield", estimatedHours],
-                [],
-                ["-------------------------------------------------------------------------"],
-                ["END OF DATA STREAM SECURE LOG - QUANTUM ANALYTICS ENGIE SYSTEM CLOUD"],
-                ["========================================================================="]
-            ];
-
-            const csvContent = csvRows.map(row => row.map(val => `"${val.toString().replace(/"/g, '""')}"`).join(",")).join("\n");
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const tempDownloadLink = document.createElement("a");
-            tempDownloadLink.setAttribute("href", URL.createObjectURL(blob));
-            tempDownloadLink.setAttribute("download", `Arcadia_Engie_Report_${mode}_${exportDate.replace(/[^a-zA-Z0-9]/g, "_")}.csv`);
-            tempDownloadLink.style.visibility = 'hidden';
-            document.body.appendChild(tempDownloadLink);
-            tempDownloadLink.click();
-            document.body.removeChild(tempDownloadLink);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            updateClockEngine();
-            setInterval(updateClockEngine, 1000);
-            maleInput.addEventListener('input', calculateMetrics);
-            femaleInput.addEventListener('input', calculateMetrics);
-            multiplierInput.addEventListener('input', calculateMetrics);
-            window.addEventListener('resize', resizeCanvas);
-            setTimeout(() => { resizeCanvas(); calculateMetrics(); }, 100);
-        });
-    </script>
+    <div class="live-date-header" id="current-date">-- --- ----</div>
+    <div class="inception-stamp" id="day-type-stamp">WORKING DAY</div>
+    <div class="primary-clock" id="live-clock">00:00:00 PST</div>
+   </div>
+   <div class="metric-card">
+    <div class="card-label">Total Headcount</div>
+    <div class="labor-counter" id="total-count-display">000</div>
+    <div class="total-staff-indicator">Active Workforce</div>
+   </div>
+   <div class="metric-card">
+    <div class="card-label">Demographic Distribution</div>
+    <div class="labor-counter" id="ratio-display" style="font-size: 22px; color: var(--text-primary); text-shadow: none;">0% M / 0% F</div>
+    <div class="total-staff-indicator">Gender Balance Ratio</div>
+   </div>
+   <div class="metric-card">
+    <div class="card-label">Estimated Man-Hours</div>
+    <div class="labor-counter" id="man-hours-display" style="color: var(--accent-bright-teal); text-shadow: 0 0 15px rgba(45, 212, 191, 0.3);">0h</div>
+    <div class="total-staff-indicator" id="shift-length-text">Shift Total (8h Avg)</div>
+   </div>
+   <div class="metric-card lost-card">
+    <div class="card-label">Lost Man-Hours</div>
+    <div class="labor-counter" id="lost-hours-display" style="color: var(--accent-red); text-shadow: 0 0 15px rgba(248, 113, 113, 0.3);">0h</div>
+    <div class="total-staff-indicator">Calendar Deficit Loss</div>
+   </div>
+   <div class="metric-card lost-card">
+    <div class="card-label">Absentee Hours Lost</div>
+    <div class="labor-counter" id="absent-hours-display" style="color: #fb923c; text-shadow: 0 0 15px rgba(251, 146, 60, 0.3);">0h</div>
+    <div class="total-staff-indicator">Deductions From Absence</div>
+   </div>
+  </div>
+  <div class="parameter-grid">
+   <div class="metric-card">
+    <div class="card-label">Demographic Breakdown Parameters</div>
+    <div class="dual-inputs">
+     <div class="input-box">
+      <label for="input-male">Male Headcount</label>
+      <input type="number" id="input-male" min="0" value="0">
+     </div>
+     <div class="input-box">
+      <label for="input-female">Female Headcount</label>
+      <input type="number" id="input-female" min="0" value="0">
+     </div>
+    </div>
+   </div>
+   <div class="metric-card">
+    <div class="card-label">Absentee Engine Tracker</div>
+    <div class="input-box">
+     <label for="input-absent">Total Days Absent (Cumulative Workforce)</label>
+     <input type="number" id="input-absent" min="0" value="0" style="border-color: rgba(248,113,113,0.4);">
+    </div>
+   </div>
+  </div>
+  <div class="metric-card">
+   <div class="card-label">Operational Parameters</div>
+   <div class="slider-box">
+    <div class="total-staff-indicator" style="margin-top:0;">
+     <span>Average Shift Length</span>
+     <span id="slider-value-display" style="color: var(--accent-bright-teal);">8 Hours</span>
+    </div>
+    <input type="range" id="input-multiplier" min="1" max="24" value="8">
+   </div>
+  </div>
+  <div class="actions-row">
+   <button class="btn btn-export" id="action-export">Export Datastream</button>
+   <button class="btn btn-reset" id="action-reset">Reset</button>
+  </div>
+ </div>
+ <script src="app.js"></script>
 </body>
 </html>
