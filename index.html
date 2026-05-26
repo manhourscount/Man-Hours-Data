@@ -246,12 +246,7 @@
   background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);
   color: white;
  }
- .btn-reset {
-  flex: 1;
-  background: rgba(248, 113, 113, 0.1);
-  color: var(--accent-red);
-  border: 1px solid rgba(248, 113, 113, 0.2);
- }
+ 
  @media (max-width: 768px) {
   .grid-row, .parameter-grid { grid-template-columns: 1fr; }
  }
@@ -315,11 +310,11 @@
     <div class="dual-inputs">
      <div class="input-box">
       <label for="input-male">Male Headcount</label>
-      <input type="number" id="input-male" min="223" value="223">
+      <input type="number" id="input-male" min="0" value="223">
      </div>
      <div class="input-box">
       <label for="input-female">Female Headcount</label>
-      <input type="number" id="input-female" min="228" value="228">
+      <input type="number" id="input-female" min="0" value="228">
      </div>
     </div>
    </div>
@@ -343,7 +338,6 @@
   </div>
   <div class="actions-row">
    <button class="btn btn-export" id="action-export">Export Datastream</button>
-   <button class="btn btn-reset" id="action-reset">Reset</button>
   </div>
  </div>
  <script src="app.js"></script>
