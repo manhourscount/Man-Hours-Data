@@ -120,7 +120,7 @@ function updateClockEngine() {
 }
 
 function resetForm() {
- maleInput.value = 0; femaleInput.value = 0; absentInput.value = 0; multiplierInput.value = 8;
+ absentInput.value = 0; multiplierInput.value = 8;
  timeFilter.value = 'LIVE'; calculateMetrics();
 }
 
