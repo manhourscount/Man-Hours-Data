@@ -118,12 +118,6 @@ function updateClockEngine() {
  clockDisplay.textContent = timeObj.getHours().toString().padStart(2, '0') + ":" + timeObj.getMinutes().toString().padStart(2, '0') + ":" + timeObj.getSeconds().toString().padStart(2, '0') + " PST";
  dateDisplay.textContent = timeObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
-
-function resetForm() {
- absentInput.value = 0; multiplierInput.value = 8;
- timeFilter.value = 'LIVE'; calculateMetrics();
-}
-
 function exportMetrics() {
  const csvRows = [
   ["========================================================================="],
