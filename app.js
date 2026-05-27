@@ -237,7 +237,7 @@ function exportMetrics() {
   .metric-high { color: #0d9488; background-color: #ccfbf1; text-align: right; font-weight: bold; border: 1px solid #99f6e4; }
   .metric-loss { color: #e11d48; background-color: #ffe4e6; text-align: right; font-weight: bold; border: 1px solid #fecdd3; }
  </style></head><body><table>
-   <tr><td colspan="2" class="title-header">ARCADIA x ENGIE — AUDITED OPERATIONS REPORT</td></tr>
+   <tr><td colspan="2" class="title-header">ARCADIA x ENGIE AUDITED OPERATIONS REPORT</td></tr>
    <tr><td class="meta-left">Generation Date: ${dateDisplay.textContent}</td><td class="meta-right">Time: ${clockDisplay.textContent}</td></tr>
    <tr><td class="meta-left">Timeline Framework Mode:</td><td class="meta-right">${timelineModeText}</td></tr>
    <tr><td colspan="2" style="background-color: #ffffff;"></td></tr>
