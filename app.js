@@ -1,3 +1,20 @@
+import { initializeApp } from "https://gstatic.com";
+import { getAuth, signInWithEmailAndPassword } from "https://gstatic.com";
+import { getDatabase, ref, set, onValue } from "https://gstatic.com";
+const firebaseConfig = {
+  apiKey: "AIzaSyA8IQoTkkv_rCW8GPhYXh9-NRT0jnLRqhs",
+  authDomain: "man-hours-data.firebaseapp.com",
+  databaseURL: "https://firebasedatabase.app",
+  projectId: "man-hours-data",
+  storageBucket: "man-hours-data.firebasestorage.app",
+  messagingSenderId: "72349451353",
+  appId: "1:72349451353:web:7d7dce29a6d9ba6c44dd48",
+  measurementId: "G-XN3ZB7PXP6"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const TAB_ID = "main_tab_data";
 // ==========================================
 // 1. GLOBAL ELEMENT SELECTORS & DATABASES
 // ==========================================
@@ -35,7 +52,7 @@ const phHolidays2026 = {
 };
 
 // Smart LocalStorage Database Layer
-const monthlyAbsenteeStorage = JSON.parse(localStorage.getItem('arcadia_absentee_db')) || {};
+let monthlyAbsenteeStorage = {}; 
 let previousTimeFilterMode = 'LIVE';
 
 // Helper to format date object to standard ISO string (YYYY-MM-DD)
