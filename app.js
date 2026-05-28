@@ -1,8 +1,17 @@
 // =========================================================================
-// 1. FIREBASE INITIALIZATION & GLOBAL ELEMENT SELECTORS
+// NEW TOP OF APP.JS (NO IMPORTS REQUIRED)
 // =========================================================================
-import { initializeApp } from "https://cloudflare.com";
-import { getDatabase, ref, onValue, set } from "https://cloudflare.com";
+// Replace with your actual Firebase Realtime Database URL
+const firebaseConfig = {
+  databaseURL: "https://firebaseio.com" 
+};
+
+// Initialize Firebase via global window scripts
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Global DOM Selectors continue below...
+const maleInput = document.getElementById('input-male');
 
 // Make sure your database URL is inside the quotation marks below!
 const firebaseConfig = {
