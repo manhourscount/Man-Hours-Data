@@ -133,7 +133,7 @@ function isNonWorkingDay(dateObj) {
   const dayOfWeek = dateObj.getDay(); 
   if (dayOfWeek === 0 || dayOfWeek === 6) return { isHoliday: true, name: "Weekend" };
   const monthDayKey = (dateObj.getMonth() + 1) + '-' + dateObj.getDate();
-  if (phHolidays2026[monthDayKey]) return { isHoliday: true, name: phHolidays2026[monthDayKey]; };
+ if (phHolidays2026[monthDayKey]) return { isHoliday: true, name: phHolidays2026[monthDayKey] };
   return { isHoliday: false, name: "Working Day" };
 }
 
