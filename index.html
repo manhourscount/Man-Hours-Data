@@ -381,9 +381,12 @@
    <button class="btn btn-export" id="action-export">Export Datastream</button>
   </div>
  </div>
- <script src="https://gstatic.com"></script>
+ <!-- Load Firebase Compat Libraries Globally -->
+<script src="https://gstatic.com"></script>
 <script src="https://gstatic.com"></script>
 
- <script type="module" src="app.js"></script>
+<!-- Link your main script file (Added cache-busting string to force update) -->
+<script src="app.js?v=9.9"></script>
+
 </body>
 </html>
