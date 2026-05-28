@@ -3,7 +3,7 @@
 // =========================================================================
 // Replace with your actual Firebase Realtime Database URL
 const firebaseConfig = {
-  databaseURL: "https://console.firebase.google.com/project/man-hours-data/database/man-hours-data-default-rtdb/data/~2F"
+  databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 // Initialize Firebase using the global window variables
