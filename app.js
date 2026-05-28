@@ -74,7 +74,7 @@ function sumAbsentDaysInRange(startDate, endDate) {
 }
 
 // =========================================================================
-// 3. METRICS ENGINE & TIMELINE CALCULATORS
+// 3. METRICS ENGINE & TIMELINE CALCULATORS (FIXED)
 // =========================================================================
 function getWorkingDaysCount(mode) {
   let start = new Date(), end = new Date();
@@ -133,7 +133,7 @@ function isNonWorkingDay(dateObj) {
   const dayOfWeek = dateObj.getDay(); 
   if (dayOfWeek === 0 || dayOfWeek === 6) return { isHoliday: true, name: "Weekend" };
   const monthDayKey = (dateObj.getMonth() + 1) + '-' + dateObj.getDate();
-  if (phHolidays2026[monthDayKey]) return { isHoliday: true, name: phHolidays2026[monthDayKey] };
+  if (phHolidays2026[monthDayKey]) return { isHoliday: true, name: phHolidays2026[monthDayKey]; };
   return { isHoliday: false, name: "Working Day" };
 }
 
@@ -221,7 +221,7 @@ function calculateMetrics() {
 }
 
 // =========================================================================
-// 4. ABSENTEE VIEW DATA SYNCHRONIZER
+// 4. ABSENTEE VIEW DATA SYNCHRONIZER (FIXED)
 // =========================================================================
 function loadAbsenteeInputData() {
   const currentMode = timeFilter.value;
