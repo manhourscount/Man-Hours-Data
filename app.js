@@ -223,10 +223,12 @@ function calculateMetrics() {
 // =========================================================================
 // 4. ABSENTEE VIEW DATA SYNCHRONIZER (FIXED)
 // =========================================================================
+import { initializeApp } from "https://gstatic.com";
+import { getDatabase, ref, onValue, set } from "https://gstatic.com";
+
 function loadAbsenteeInputData() {
   const currentMode = timeFilter.value;
   const localNow = new Date();
-  
   if (currentMode === 'LIVE') {
     const todayKey = formatDateKey(localNow);
     absentInput.value = monthlyAbsenteeStorage[todayKey] || 0;
