@@ -1,25 +1,14 @@
 // =========================================================================
-// NEW TOP OF APP.JS (NO IMPORTS REQUIRED)
+// 1. FIREBASE SETUP & GLOBAL ELEMENT SELECTORS
 // =========================================================================
 // Replace with your actual Firebase Realtime Database URL
 const firebaseConfig = {
   databaseURL: "https://firebaseio.com" 
 };
 
-// Initialize Firebase via global window scripts
+// Initialize Firebase using the global window variables
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
-// Global DOM Selectors continue below...
-const maleInput = document.getElementById('input-male');
-
-// Make sure your database URL is inside the quotation marks below!
-const firebaseConfig = {
-  databaseURL: "https://firebaseio.com" 
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 
 // Global DOM Selectors
 const maleInput = document.getElementById('input-male');
@@ -44,7 +33,6 @@ const chartEfficiencyLabel = document.getElementById('chart-efficiency-label');
 const chartEfficiencyBar = document.getElementById('chart-efficiency-bar');
 const chartLossLabel = document.getElementById('chart-loss-label');
 const chartLossBar = document.getElementById('chart-loss-bar');
-
 // =========================================================================
 // 2. HOLIDAY CALENDAR, RUNTIME DATABASE, & DATE HELPERS
 // =========================================================================
@@ -81,9 +69,8 @@ function sumAbsentDaysInRange(startDate, endDate) {
   }
   return sum;
 }
-
 // =========================================================================
-// 3. METRICS ENGINE & TIMELINE CALCULATORS (FIXED)
+// 3. METRICS ENGINE & TIMELINE CALCULATORS
 // =========================================================================
 function getWorkingDaysCount(mode) {
   let start = new Date(), end = new Date();
@@ -137,6 +124,7 @@ function getTotalWeekdaysCount(mode) {
   }
   return weekdayDays || 1;
 }
+
 function isNonWorkingDay(dateObj) {
   const dayOfWeek = dateObj.getDay(); 
   if (dayOfWeek === 0 || dayOfWeek === 6) {
@@ -148,6 +136,7 @@ function isNonWorkingDay(dateObj) {
   }
   return { isHoliday: false, name: "Working Day" };
 }
+
 function calculateMetrics() {
   const maleVal = parseInt(maleInput.value) || 0;
   const femaleVal = parseInt(femaleInput.value) || 0;
@@ -230,13 +219,13 @@ function calculateMetrics() {
   chartLossLabel.textContent = lossPercentage + "%";
   chartLossBar.style.width = lossPercentage + "%";
 }
-
 // =========================================================================
-// 4. ABSENTEE VIEW DATA SYNCHRONIZER (FIXED)
+// 4. ABSENTEE VIEW DATA VISUALIZER
 // =========================================================================
 function loadAbsenteeInputData() {
   const currentMode = timeFilter.value;
   const localNow = new Date();
+  
   if (currentMode === 'LIVE') {
     const todayKey = formatDateKey(localNow);
     absentInput.value = monthlyAbsenteeStorage[todayKey] || 0;
@@ -254,9 +243,8 @@ function loadAbsenteeInputData() {
     absentInput.value = sumAbsentDaysInRange(startOfMonth, endOfMonth);
   }
 }
-
 // =========================================================================
-// 5. DATA EXPORT REPORT ENGINE
+// 5. REPORT EXPORT ENGINE & TIME UTILITIES
 // =========================================================================
 function exportMetrics() {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -282,7 +270,7 @@ function exportMetrics() {
   .metric-high { color: #0d9488; background-color: #ccfbf1; text-align: right; font-weight: bold; border: 1px solid #99f6e4; }
   .metric-loss { color: #e11d48; background-color: #ffe4e6; text-align: right; font-weight: bold; border: 1px solid #fecdd3; }
   </style></head><body><table>
-  <tr><td colspan="2" class="title-header">ARCADIA x ENGIE AUDITED OPERATIONS REPORT</td></tr>
+  <tr><td colspan="2" class="title-header">ARCADIA REPORT</td></tr>
   <tr><td class="meta-left">Generation Date: ${dateDisplay.textContent}</td><td class="meta-right">Time: ${clockDisplay.textContent}</td></tr>
   <tr><td class="meta-left">Timeline Framework Mode:</td><td class="meta-right">${timelineModeText}</td></tr>
   <tr><td colspan="2" style="background-color: #ffffff;"></td></tr>
@@ -321,26 +309,22 @@ function updateClockEngine() {
   dateDisplay.textContent = timeObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 // =========================================================================
-// 6. REALTIME CLOCK & GLOBAL REALTIME FIREBASE EVENT LISTENERS
+// 6. INITIALIZATION & LIVE REALTIME FIREBASE SYNC LISTENERS
 // =========================================================================
-// Start live background clock engine loop
+// Run base time clock setup
 updateClockEngine();
 setInterval(updateClockEngine, 1000);
 absentInput.disabled = false;
 
-// 1. Establish the Real-Time Cloud Listener
-onValue(ref(db, 'arcadia_absentee_db'), (snapshot) => {
+// 1. Establish the Real-Time Compatibility Listener
+db.ref('arcadia_absentee_db').on('value', (snapshot) => {
   const cloudData = snapshot.val() || {};
-  
-  // Directly swap out old offline values with matching centralized records
   monthlyAbsenteeStorage = cloudData;
-  
-  // Refresh layout visuals seamlessly
   loadAbsenteeInputData();
   calculateMetrics();
 });
 
-// 2. Local Input Processors (Write-Back Interceptors)
+// 2. Input Write-Back Listener
 absentInput.addEventListener('input', () => {
   const currentMode = timeFilter.value;
   const localNow = new Date();
@@ -370,12 +354,12 @@ absentInput.addEventListener('input', () => {
     monthlyAbsenteeStorage['2026-01-01'] = rawValue;
   }
   
-  // Sync memory tree array update back to Firebase
-  set(ref(db, 'arcadia_absentee_db'), monthlyAbsenteeStorage)
-    .catch((err) => console.error("Database connection rule violation blocked save:", err));
+  // Save directly to the cloud path
+  db.ref('arcadia_absentee_db').set(monthlyAbsenteeStorage)
+    .catch((err) => console.error("Firebase connection blocked save:", err));
 });
 
-// 3. Simple Interface Interaction Trackers
+// 3. User Layout Interaction Hooks
 timeFilter.addEventListener('change', () => {
   loadAbsenteeInputData();
   previousTimeFilterMode = timeFilter.value;
@@ -388,4 +372,3 @@ multiplierInput.addEventListener('input', calculateMetrics);
 
 const exportBtn = document.getElementById('action-export');
 if (exportBtn) exportBtn.addEventListener('click', exportMetrics);
-
