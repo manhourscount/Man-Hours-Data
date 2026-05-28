@@ -4,7 +4,7 @@
 import { initializeApp } from "https://gstatic.com";
 import { getDatabase, ref, onValue, set } from "https://gstatic.com";
 
-// Replace with your actual Firebase Realtime Database URL
+// Make sure your database URL is inside the quotation marks below!
 const firebaseConfig = {
   databaseURL: "https://firebaseio.com" 
 };
