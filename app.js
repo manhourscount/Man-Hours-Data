@@ -1,8 +1,8 @@
 // =========================================================================
 // 1. FIREBASE INITIALIZATION & GLOBAL ELEMENT SELECTORS
 // =========================================================================
-import { initializeApp } from "https://gstatic.com";
-import { getDatabase, ref, onValue, set } from "https://gstatic.com";
+import { initializeApp } from "https://cloudflare.com";
+import { getDatabase, ref, onValue, set } from "https://cloudflare.com";
 
 // Make sure your database URL is inside the quotation marks below!
 const firebaseConfig = {
