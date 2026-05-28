@@ -381,12 +381,16 @@
    <button class="btn btn-export" id="action-export">Export Datastream</button>
   </div>
  </div>
- <!-- Load Firebase Compat Libraries Globally -->
-<script src="https://gstatic.com"></script>
-<script src="https://gstatic.com"></script>
 
-<!-- Link your main script file (Added cache-busting string to force update) -->
+<!-- 1. Load Firebase Core App Framework First -->
+<script src="https://cloudflare.com"></script>
+
+<!-- 2. Load Firebase Realtime Database Extension Second -->
+<script src="https://cloudflare.com"></script>
+
+<!-- 3. Load Your Custom Application Script Last -->
 <script src="app.js?v=9.9"></script>
+
 
 </body>
 </html>
