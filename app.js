@@ -1,7 +1,7 @@
 // =========================================================================
 // 1. FIREBASE SETUP & GLOBAL ELEMENT SELECTORS
 // =========================================================================
- const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyA8IQoTkkV_rCW8GpHYxH9-NRT0jnLRqhs",
   authDomain: "man-hours-data.firebaseapp.com",
   databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -11,6 +11,7 @@
   appId: "1:72349451353:web:7d7dce29a6d9ba6c44dd48",
   measurementId: "G-XN3ZB7PXP6"
 };
+
 // Initialize Firebase using the global window variables
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
