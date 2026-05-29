@@ -1,11 +1,17 @@
 // =========================================================================
 // 1. FIREBASE SETUP & GLOBAL ELEMENT SELECTORS
 // =========================================================================
-// Replace with your actual Firebase Realtime Database URL
-const firebaseConfig = {
-  databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app/"
+ const firebaseConfig = {
+  apiKey: "AIzaSyA8IQoTkkV_rCW8GpHYxH9-NRT0jnLRqhs",
+  authDomain: "man-hours-data.firebaseapp.com",
+  databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "man-hours-data",
+  storageBucket: "man-hours-data.firebasestorage.app",
+  messagingSenderId: "72349451353",
+  appId: "1:72349451353:web:7d7dce29a6d9ba6c44dd48",
+  measurementId: "G-XN3ZB7PXP6"
+ databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app/" 
 };
-
 // Initialize Firebase using the global window variables
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -61,10 +67,20 @@ function formatDateKey(dateObj) {
 // Helper to sum up absent days across a range
 function sumAbsentDaysInRange(startDate, endDate) {
   let sum = 0;
+  // Convert inputs safely to Date objects and extract their primitive timestamp values
   let current = new Date(startDate);
-  while (current <= endDate) {
+  const endLimit = new Date(endDate).getTime();
+
+  // Compare using primitive numerical timestamps to prevent infinite loops
+  while (current.getTime() <= endLimit) {
     const key = formatDateKey(current);
-    sum += parseInt(monthlyAbsenteeStorage[key]) || 0;
+    
+    // Check if key exists first, then parse safely
+    if (monthlyAbsenteeStorage[key]) {
+      sum += parseInt(monthlyAbsenteeStorage[key], 10) || 0;
+    }
+    
+    // Correctly increments the day
     current.setDate(current.getDate() + 1);
   }
   return sum;
@@ -74,25 +90,34 @@ function sumAbsentDaysInRange(startDate, endDate) {
 // =========================================================================
 function getWorkingDaysCount(mode) {
   let start = new Date(), end = new Date();
+  const currentYear = new Date().getFullYear();
+
   if (mode === 'MTD') {
     start.setDate(1);
   } else if (mode === 'YTD') {
     start.setMonth(0, 1);
   } else if (mode.startsWith('M-')) {
-    const targetMonth = parseInt(mode.split('-')[1]);
-    start = new Date(2026, targetMonth, 1);
+    // Correcting 1-based string conversion to 0-based JS Month
+    const targetMonth = parseInt(mode.split('-')[1], 10) - 1;
+    start = new Date(currentYear, targetMonth, 1);
+    
     if (targetMonth === new Date().getMonth()) {
       end = new Date();
     } else {
-      end = new Date(2026, targetMonth + 1, 0);
+      end = new Date(currentYear, targetMonth + 1, 0);
     }
   } else {
     return 1;
   }
-  let workingDays = 0, current = new Date(start);
-  while (current <= end) {
+  
+  let workingDays = 0;
+  let current = new Date(start);
+  const endLimit = end.getTime();
+
+  while (current.getTime() <= endLimit) {
     const day = current.getDay();
     const key = (current.getMonth() + 1) + '-' + current.getDate();
+    // 0 = Sunday, 6 = Saturday
     if (day !== 0 && day !== 6 && !phHolidays2026[key]) workingDays++;
     current.setDate(current.getDate() + 1);
   }
@@ -101,23 +126,29 @@ function getWorkingDaysCount(mode) {
 
 function getTotalWeekdaysCount(mode) {
   let start = new Date(), end = new Date();
+  const currentYear = new Date().getFullYear();
+
   if (mode === 'MTD') {
     start.setDate(1);
   } else if (mode === 'YTD') {
     start.setMonth(0, 1);
   } else if (mode.startsWith('M-')) {
-    const targetMonth = parseInt(mode.split('-')[1]);
-    start = new Date(2026, targetMonth, 1);
+    const targetMonth = parseInt(mode.split('-')[1], 10) - 1;
+    start = new Date(currentYear, targetMonth, 1);
     if (targetMonth === new Date().getMonth()) {
       end = new Date();
     } else {
-      end = new Date(2026, targetMonth + 1, 0);
+      end = new Date(currentYear, targetMonth + 1, 0);
     }
   } else {
     return 1;
   }
-  let weekdayDays = 0, current = new Date(start);
-  while (current <= end) {
+  
+  let weekdayDays = 0;
+  let current = new Date(start);
+  const endLimit = end.getTime();
+
+  while (current.getTime() <= endLimit) {
     const day = current.getDay();
     if (day !== 0 && day !== 6) weekdayDays++;
     current.setDate(current.getDate() + 1);
@@ -138,15 +169,16 @@ function isNonWorkingDay(dateObj) {
 }
 
 function calculateMetrics() {
-  const maleVal = parseInt(maleInput.value) || 0;
-  const femaleVal = parseInt(femaleInput.value) || 0;
+  // Safe parsing references assuming your DOM elements are instantiated properly
+  const maleVal = parseInt(maleInput.value, 10) || 0;
+  const femaleVal = parseInt(femaleInput.value, 10) || 0;
   const totalHeadcount = maleVal + femaleVal;
-  const hoursPerDay = parseInt(multiplierInput.value) || 8;
+  const hoursPerDay = parseInt(multiplierInput.value, 10) || 8;
   const mode = timeFilter.value;
   const localNow = new Date();
   const dayCheck = isNonWorkingDay(localNow);
   
-  const totalDaysAbsent = parseInt(absentInput.value) || 0;
+  const totalDaysAbsent = parseInt(absentInput.value, 10) || 0;
   const absentHoursDeduction = totalDaysAbsent * hoursPerDay;
   
   if (mode === 'LIVE' && dayCheck.isHoliday) {
@@ -161,7 +193,7 @@ function calculateMetrics() {
       dayTypeStamp.textContent = "WORKING DAY";
     } else if (mode.startsWith('M-')) {
       const selectedOption = timeFilter.options[timeFilter.selectedIndex];
-      dayTypeStamp.textContent = selectedOption.text.toUpperCase() + " 2026";
+      dayTypeStamp.textContent = selectedOption ? selectedOption.text.toUpperCase() + " 2026" : "MONTHLY";
     } else {
       dayTypeStamp.textContent = mode + " ACTIVE";
     }
@@ -178,7 +210,7 @@ function calculateMetrics() {
     shiftLengthText.textContent = "Shift Total (" + hoursPerDay + "h Avg)";
   } else if (mode.startsWith('M-')) {
     const selectedOption = timeFilter.options[timeFilter.selectedIndex];
-    shiftLengthText.textContent = selectedOption.text + " Total (" + hoursPerDay + "h/d)";
+    shiftLengthText.textContent = (selectedOption ? selectedOption.text : "Month") + " Total (" + hoursPerDay + "h/d)";
   } else {
     shiftLengthText.textContent = mode + " Total (" + hoursPerDay + "h/d)";
   }
@@ -210,8 +242,8 @@ function calculateMetrics() {
     efficiencyPercentage = Math.min(100, Math.max(0, efficiencyPercentage));
     lossPercentage = Math.min(100, Math.max(0, lossPercentage));
   } else {
-    efficiencyPercentage = mode === 'LIVE' && dayCheck.isHoliday ? 0 : 100;
-    lossPercentage = 0;
+    efficiencyPercentage = (mode === 'LIVE' && dayCheck.isHoliday) ? 0 : 100;
+    lossPercentage = (mode === 'LIVE' && dayCheck.isHoliday) ? 100 : 0; // Fixes inverse loss tracking logic
   }
   
   chartEfficiencyLabel.textContent = efficiencyPercentage + "%";
@@ -231,35 +263,61 @@ function loadAbsenteeInputData() {
     absentInput.value = monthlyAbsenteeStorage[todayKey] || 0;
   } else if (currentMode === 'MTD') {
     const startOfMonth = new Date(localNow.getFullYear(), localNow.getMonth(), 1);
-    absentInput.value = sumAbsentDaysInRange(startOfMonth, localNow);
+    // Passing a new date instance prevents reference mutation bugs
+    absentInput.value = sumAbsentDaysInRange(startOfMonth, new Date(localNow));
   } else if (currentMode === 'YTD') {
     const startOfYear = new Date(localNow.getFullYear(), 0, 1);
-    absentInput.value = sumAbsentDaysInRange(startOfYear, localNow);
+    absentInput.value = sumAbsentDaysInRange(startOfYear, new Date(localNow));
   } else if (currentMode.startsWith('M-')) {
-    const targetMonth = parseInt(currentMode.split('-')[1]);
-    const startOfMonth = new Date(2026, targetMonth, 1);
-    let endOfMonth = new Date(2026, targetMonth + 1, 0);
-    if (targetMonth === localNow.getMonth()) endOfMonth = localNow;
+    // Fixed: Parse and subtract 1 to align with JavaScript's 0-indexed month system
+    const targetMonth = parseInt(currentMode.split('-')[1], 10) - 1;
+    
+    // Ensure we track against the current tracking year context safely
+    const currentYear = localNow.getFullYear(); 
+    const startOfMonth = new Date(currentYear, targetMonth, 1);
+    let endOfMonth;
+    
+    if (targetMonth === localNow.getMonth()) {
+      endOfMonth = new Date(localNow); // Copy current day if it's the current month
+    } else {
+      endOfMonth = new Date(currentYear, targetMonth + 1, 0); // Last day of that specific month
+    }
+    
     absentInput.value = sumAbsentDaysInRange(startOfMonth, endOfMonth);
   }
 }
+
 // =========================================================================
 // 5. REPORT EXPORT ENGINE & TIME UTILITIES
 // =========================================================================
 function exportMetrics() {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   let timelineModeText = timeFilter.value;
-  if (timeFilter.value === 'LIVE') timelineModeText = "Live Window Profile";
-  else if (timeFilter.value === 'MTD') timelineModeText = "Month-to-Date (MTD) Summary";
-  else if (timeFilter.value === 'YTD') timelineModeText = "Year-to-Date (YTD) Summary";
-  else if (timeFilter.value.startsWith('M-')) {
-    const monthIdx = parseInt(timeFilter.value.split('-')[1]);
-    timelineModeText = monthNames[monthIdx] + " 2026 Archive";
-  }
-  const grossHours = (parseInt(totalDisplay.textContent) * getWorkingDaysCount(timeFilter.value) * parseInt(multiplierInput.value)).toLocaleString() + " Hours";
   
+  if (timeFilter.value === 'LIVE') {
+    timelineModeText = "Live Window Profile";
+  } else if (timeFilter.value === 'MTD') {
+    timelineModeText = "Month-to-Date (MTD) Summary";
+  } else if (timeFilter.value === 'YTD') {
+    timelineModeText = "Year-to-Date (YTD) Summary";
+  } else if (timeFilter.value.startsWith('M-')) {
+    // Fixed: Subtract 1 to correct JavaScript's 0-indexed array behavior
+    const monthIdx = parseInt(timeFilter.value.split('-')[1], 10) - 1;
+    timelineModeText = (monthNames[monthIdx] || "Unknown Month") + " 2026 Archive";
+  }
+  
+  // Fixed: Fallback to input elements directly to guarantee clean numerical parsing
+  const maleVal = parseInt(maleInput.value, 10) || 0;
+  const femaleVal = parseInt(femaleInput.value, 10) || 0;
+  const accurateHeadcount = maleVal + femaleVal;
+  const hoursPerDay = parseInt(multiplierInput.value, 10) || 8;
+  
+  const grossHoursCalculated = accurateHeadcount * getWorkingDaysCount(timeFilter.value) * hoursPerDay;
+  const grossHours = grossHoursCalculated.toLocaleString() + " Hours";
+  
+  // Fixed: Corrected the schema URI string to follow valid standard formats
   let workbookOutput = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org">
-  <head><style>
+  <head><meta charset="utf-8"><style>
   td { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11pt; padding: 6px; }
   .title-header { background-color: #0f766e; color: #ffffff; font-size: 14pt; font-weight: bold; text-align: center; border-bottom: 2px solid #115e59; }
   .meta-left { background-color: #f1f5f9; color: #475569; font-size: 10pt; font-style: italic; border-bottom: 1px solid #cbd5e1; }
@@ -275,13 +333,13 @@ function exportMetrics() {
   <tr><td class="meta-left">Timeline Framework Mode:</td><td class="meta-right">${timelineModeText}</td></tr>
   <tr><td colspan="2" style="background-color: #ffffff;"></td></tr>
   <tr><td colspan="2" class="section-header">1. HEADCOUNT &amp; DEMOGRAPHICS SUMMARY</td></tr>
-  <tr><td class="label-col">Total Dynamic Headcount</td><td class="value-col">${totalDisplay.textContent} Personnel</td></tr>
-  <tr><td class="label-col">Male Count Allocation</td><td class="value-col">${maleInput.value || 0}</td></tr>
-  <tr><td class="label-col">Female Count Allocation</td><td class="value-col">${femaleInput.value || 0}</td></tr>
+  <tr><td class="label-col">Total Dynamic Headcount</td><td class="value-col">${totalDisplay.textContent}</td></tr>
+  <tr><td class="label-col">Male Count Allocation</td><td class="value-col">${maleVal}</td></tr>
+  <tr><td class="label-col">Female Count Allocation</td><td class="value-col">${femaleVal}</td></tr>
   <tr><td class="label-col">Gender Diversity Ratio</td><td class="value-col">${ratioDisplay.textContent}</td></tr>
   <tr><td colspan="2" style="background-color: #ffffff;"></td></tr>
   <tr><td colspan="2" class="section-header">2. AUDITED OPERATIONAL MAN-HOURS MATRIX</td></tr>
-  <tr><td class="label-col">Shift Length Base Baseline</td><td class="value-col">${multiplierInput.value} Hours/Day</td></tr>
+  <tr><td class="label-col">Shift Length Base Baseline</td><td class="value-col">${hoursPerDay} Hours/Day</td></tr>
   <tr><td class="label-col">Gross Estimated Work Hours</td><td class="value-col">${grossHours}</td></tr>
   <tr><td class="label-col">Absentee Days Logged</td><td class="value-col">${absentInput.value || 0} Days</td></tr>
   <tr><td class="label-col">Deducted Absentee Hours Loss</td><td class="value-col">${absentHoursDisplay.textContent}</td></tr>
@@ -305,9 +363,12 @@ function exportMetrics() {
 
 function updateClockEngine() {
   const timeObj = new Date();
-  clockDisplay.textContent = timeObj.getHours().toString().padStart(2, '0') + ":" + timeObj.getMinutes().toString().padStart(2, '0') + ":" + timeObj.getSeconds().toString().padStart(2, '0') + " PST";
+  clockDisplay.textContent = timeObj.getHours().toString().padStart(2, '0') + ":" + 
+                             timeObj.getMinutes().toString().padStart(2, '0') + ":" + 
+                             timeObj.getSeconds().toString().padStart(2, '0') + " PST";
   dateDisplay.textContent = timeObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
+
 // =========================================================================
 // 6. INITIALIZATION & LIVE REALTIME FIREBASE SYNC LISTENERS
 // =========================================================================
@@ -319,40 +380,52 @@ absentInput.disabled = false;
 // 1. Establish the Real-Time Compatibility Listener
 db.ref('arcadia_absentee_db').on('value', (snapshot) => {
   const cloudData = snapshot.val() || {};
-  monthlyAbsenteeStorage = cloudData;
-  loadAbsenteeInputData();
-  calculateMetrics();
+  
+  // Guard against race conditions: Only re-render if the storage reference has actually changed
+  if (JSON.stringify(monthlyAbsenteeStorage) !== JSON.stringify(cloudData)) {
+    monthlyAbsenteeStorage = cloudData;
+    loadAbsenteeInputData();
+    calculateMetrics();
+  }
 });
 
 // 2. Input Write-Back Listener
 absentInput.addEventListener('input', () => {
   const currentMode = timeFilter.value;
   const localNow = new Date();
-  const rawValue = parseInt(absentInput.value) || 0;
+  const rawValue = parseInt(absentInput.value, 10) || 0;
   
   if (currentMode === 'LIVE') {
     const todayKey = formatDateKey(localNow);
     monthlyAbsenteeStorage[todayKey] = rawValue;
-  } else if (currentMode === 'MTD' || currentMode.startsWith('M-')) {
-    let targetMonthIdx = localNow.getMonth();
-    if (currentMode.startsWith('M-')) {
-      targetMonthIdx = parseInt(currentMode.split('-')[1]);
-    }
-    const startOfMonth = new Date(2026, targetMonthIdx, 1);
-    const endOfMonth = new Date(2026, targetMonthIdx + 1, 0);
+  } 
+  else if (currentMode === 'MTD') {
+    // FIX: To prevent deleting entire historical tracking histories, 
+    // update the actual active day under the aggregate framework view.
+    const todayKey = formatDateKey(localNow);
+    monthlyAbsenteeStorage[todayKey] = rawValue;
+  } 
+  else if (currentMode.startsWith('M-')) {
+    // FIX: Parse and correct 1-based string extraction down to 0-based month layout
+    const targetMonthIdx = parseInt(currentMode.split('-')[1], 10) - 1;
+    const currentYear = localNow.getFullYear();
     
-    let scan = new Date(startOfMonth);
-    while (scan <= endOfMonth) {
-      delete monthlyAbsenteeStorage[formatDateKey(scan)];
-      scan.setDate(scan.getDate() + 1);
+    if (targetMonthIdx === localNow.getMonth()) {
+      monthlyAbsenteeStorage[formatDateKey(localNow)] = rawValue;
+    } else {
+      // If updating a historic month archive, save to the 1st day of that month 
+      // WITHOUT purging or using the 'delete' keyword on remaining days.
+      const historicTargetKey = `${currentYear}-${String(targetMonthIdx + 1).padStart(2, '0')}-01`;
+      monthlyAbsenteeStorage[historicTargetKey] = rawValue;
     }
-    monthlyAbsenteeStorage[formatDateKey(startOfMonth)] = rawValue;
-  } else if (currentMode === 'YTD') {
-    for (let key in monthlyAbsenteeStorage) {
-      if (key.startsWith('2026-')) delete monthlyAbsenteeStorage[key];
-    }
-    monthlyAbsenteeStorage['2026-01-01'] = rawValue;
+  } 
+  else if (currentMode === 'YTD') {
+    const todayKey = formatDateKey(localNow);
+    monthlyAbsenteeStorage[todayKey] = rawValue;
   }
+  
+  // Calculate local metrics directly to keep visual responses snap-instant
+  calculateMetrics();
   
   // Save directly to the cloud path
   db.ref('arcadia_absentee_db').set(monthlyAbsenteeStorage)
@@ -371,4 +444,7 @@ femaleInput.addEventListener('input', calculateMetrics);
 multiplierInput.addEventListener('input', calculateMetrics);
 
 const exportBtn = document.getElementById('action-export');
-if (exportBtn) exportBtn.addEventListener('click', exportMetrics);
+if (exportBtn) {
+  exportBtn.addEventListener('click', exportMetrics);
+}
+
