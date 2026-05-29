@@ -213,8 +213,8 @@ function exportMetrics() {
  .meta-left { background-color: #f1f5f9; color: #475569; font-size: 10pt; font-style: italic; border-bottom: 1px solid #cbd5e1; }
  .meta-right { background-color: #f1f5f9; color: #0f766e; font-size: 10pt; font-weight: bold; text-align: right; border-bottom: 1px solid #cbd5e1; }
  .section-header { background-color: #115e59; color: #ffffff; font-weight: bold; font-size: 11pt; }
- .label-col { background-color: #f8fafc; color: #334155; width: 260px; border-left: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
- .value-col { text-align: right; font-weight: bold; color: #0f172a; width: 160px; border-left: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
+ .label-col { background-color: #f8fafc; color: #334155; width: 447px; border-left: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
+ .value-col { text-align: right; font-weight: bold; color: #0f172a; width: 425px; border-left: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
  .metric-high { color: #0d9488; background-color: #ccfbf1; text-align: right; font-weight: bold; border: 1px solid #99f6e4; }
  .metric-loss { color: #e11d48; background-color: #ffe4e6; text-align: right; font-weight: bold; border: 1px solid #fecdd3; }
  </style></head><body><table>
