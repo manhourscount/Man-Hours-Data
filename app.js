@@ -1,10 +1,14 @@
 // =========================================================================
 // 1. FIREBASE SETUP & GLOBAL ELEMENT SELECTORS
 // =========================================================================
+import { initializeApp } from "https://gstatic.com";
+import { getDatabase, ref, onValue, set } from "https://gstatic.com";
+
+// 2. Your configuration block
 const firebaseConfig = {
   apiKey: "AIzaSyA8IQoTkkV_rCW8GpHYxH9-NRT0jnLRqhs",
-  authDomain: "man-hours-data.firebaseapp.com",
-  databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app",
+  authDomain: "://firebaseapp.com",
+  databaseURL: "https://firebasedatabase.app",
   projectId: "man-hours-data",
   storageBucket: "man-hours-data.firebasestorage.app",
   messagingSenderId: "72349451353",
@@ -12,9 +16,9 @@ const firebaseConfig = {
   measurementId: "G-XN3ZB7PXP6"
 };
 
-// Initialize Firebase using the global window variables
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// 3. Initialize Firebase services
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
 // Global DOM Selectors
 const maleInput = document.getElementById('input-male');
