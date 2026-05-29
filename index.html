@@ -264,92 +264,194 @@
  <div class="status-badge" id="live-status">System Active</div>
 </div>
 
-  <div class="grid-row">
-   <div class="metric-card">
+ <div class="grid-row">
+  <div class="metric-card">
     <div class="card-label">
-     <span>Time Framework</span>
-     <select class="time-select" id="time-filter">
- <option value="LIVE" selected>LIVE WINDOW</option>
- <option value="MTD">MTD SUMMARY</option>
- <option value="YTD">YTD SUMMARY</option>
- <optgroup label="2026 Monthly Archives">
-  <option value="M-0">January</option>
-  <option value="M-1">February</option>
-  <option value="M-2">March</option>
-  <option value="M-3">April</option>
-  <option value="M-4">May</option>
-  <option value="M-5">June</option>
-  <option value="M-6">July</option>
-  <option value="M-7">August</option>
-  <option value="M-8">September</option>
-  <option value="M-9">October</option>
-  <option value="M-10">November</option>
-  <option value="M-11">December</option>
- </optgroup>
-</select>
+      <span>Time Framework</span>
+      <!-- Added onchange event listener -->
+      <select class="time-select" id="time-filter" onchange="handleTimeFilterChange()">
+        <option value="LIVE" selected>LIVE WINDOW</option>
+        <option value="MTD">MTD SUMMARY</option>
+        <option value="YTD">YTD SUMMARY</option>
+        <optgroup label="2026 Monthly Archives">
+          <option value="M-0">January</option>
+          <option value="M-1">February</option>
+          <option value="M-2">March</option>
+          <option value="M-3">April</option>
+          <option value="M-4">May</option>
+          <option value="M-5">June</option>
+          <option value="M-6">July</option>
+          <option value="M-7">August</option>
+          <option value="M-8">September</option>
+          <option value="M-9">October</option>
+          <option value="M-10">November</option>
+          <option value="M-11">December</option>
+        </optgroup>
+      </select>
     </div>
     <div class="live-date-header" id="current-date">-- --- ----</div>
     <div class="inception-stamp" id="day-type-stamp">WORKING DAY</div>
     <div class="primary-clock" id="live-clock">00:00:00 PST</div>
-   </div>
-   <div class="metric-card">
+  </div>
+
+  <div class="metric-card">
     <div class="card-label">Total Headcount</div>
     <div class="labor-counter" id="total-count-display">000</div>
     <div class="total-staff-indicator">Active Workforce</div>
-   </div>
-   <div class="metric-card">
+  </div>
+
+  <div class="metric-card">
     <div class="card-label">Demographic Distribution</div>
     <div class="labor-counter" id="ratio-display" style="font-size: 22px; color: var(--text-primary); text-shadow: none;">0% M / 0% F</div>
     <div class="total-staff-indicator">Gender Balance Ratio</div>
-   </div>
-   <div class="metric-card">
+  </div>
+
+  <div class="metric-card">
     <div class="card-label">Estimated Man-Hours</div>
     <div class="labor-counter" id="man-hours-display" style="color: var(--accent-bright-teal); text-shadow: 0 0 15px rgba(45, 212, 191, 0.3);">0h</div>
     <div class="total-staff-indicator" id="shift-length-text">Shift Total (8h Avg)</div>
-   </div>
-   <div class="metric-card lost-card">
+  </div>
+
+  <div class="metric-card lost-card">
     <div class="card-label">Lost Man-Hours</div>
     <div class="labor-counter" id="lost-hours-display" style="color: var(--accent-red); text-shadow: 0 0 15px rgba(248, 113, 113, 0.3);">0h</div>
     <div class="total-staff-indicator">Calendar Deficit Loss</div>
-   </div>
-   <div class="metric-card lost-card">
+  </div>
+
+  <div class="metric-card lost-card">
     <div class="card-label">Absentee Hours Lost</div>
     <div class="labor-counter" id="absent-hours-display" style="color: #fb923c; text-shadow: 0 0 15px rgba(251, 146, 60, 0.3);">0h</div>
     <div class="total-staff-indicator">Deductions From Absence</div>
-   </div>
   </div>
-  <div class="parameter-grid">
-   <div class="metric-card">
+</div>
+
+<div class="parameter-grid">
+  <div class="metric-card">
     <div class="card-label">Demographic Breakdown Parameters</div>
     <div class="dual-inputs">
-     <div class="input-box">
-      <label for="input-male">Male Headcount</label>
-      <input type="number" id="input-male" min="0" value="223">
-     </div>
-     <div class="input-box">
-      <label for="input-female">Female Headcount</label>
-      <input type="number" id="input-female" min="0" value="228">
-     </div>
+      <div class="input-box">
+        <label for="input-male">Male Headcount</label>
+        <!-- Added oninput listener -->
+        <input type="number" id="input-male" min="0" value="223" oninput="updateCurrentDataAndCalculate()">
+      </div>
+      <div class="input-box">
+        <label for="input-female">Female Headcount</label>
+        <!-- Added oninput listener -->
+        <input type="number" id="input-female" min="0" value="228" oninput="updateCurrentDataAndCalculate()">
+      </div>
     </div>
-   </div>
-   <div class="metric-card">
+  </div>
+
+  <div class="metric-card">
     <div class="card-label">Occupational Injury and Illness Metric</div>
     <div class="input-box">
-     <label for="input-absent">Total Days Absent (Cumulative Workforce)</label>
-     <input type="number" id="input-absent" min="0" value="0" style="border-color: rgba(248,113,113,0.4);">
+      <label for="input-absent">Total Days Absent (Cumulative Workforce)</label>
+      <!-- Added oninput listener -->
+      <input type="number" id="input-absent" min="0" value="0" style="border-color: rgba(248,113,113,0.4);" oninput="updateCurrentDataAndCalculate()">
     </div>
-   </div>
   </div>
-  <div class="metric-card">
-   <div class="card-label">Operational Parameters</div>
-   <div class="slider-box">
+</div>
+
+<div class="metric-card">
+  <div class="card-label">Operational Parameters</div>
+  <div class="slider-box">
     <div class="total-staff-indicator" style="margin-top:0;">
-     <span>Average Shift Length</span>
-     <span id="slider-value-display" style="color: var(--accent-bright-teal);">8 Hours</span>
+      <span>Average Shift Length</span>
+      <span id="slider-value-display" style="color: var(--accent-bright-teal);">8 Hours</span>
     </div>
-    <input type="range" id="input-multiplier" min="1" max="24" value="8">
-   </div>
+    <!-- Added oninput listener -->
+    <input type="range" id="input-multiplier" min="1" max="24" value="8" oninput="updateCurrentDataAndCalculate()">
   </div>
+</div>
+
+<script>
+  // Central data store holding parameters for every filter option
+  const dashboardData = {
+    'LIVE': { male: 223, female: 228, absentDays: 0, shiftLength: 8 },
+    'MTD':  { male: 210, female: 215, absentDays: 5, shiftLength: 8 },
+    'YTD':  { male: 195, female: 200, absentDays: 45, shiftLength: 8 },
+    'M-0':  { male: 180, female: 190, absentDays: 12, shiftLength: 8 }, // Jan
+    'M-1':  { male: 185, female: 192, absentDays: 8,  shiftLength: 8 }, // Feb
+    'M-2':  { male: 190, female: 195, absentDays: 10, shiftLength: 8 }, // Mar
+    'M-3':  { male: 200, female: 210, absentDays: 6,  shiftLength: 8 }, // Apr
+    'M-4':  { male: 223, female: 228, absentDays: 4,  shiftLength: 8 }, // May
+    'M-5':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Jun
+    'M-6':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Jul
+    'M-7':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Aug
+    'M-8':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Sep
+    'M-9':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Oct
+    'M-10': { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Nov
+    'M-11': { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }  // Dec
+  };
+
+  // Runs automatically when the dropdown changes
+  function handleTimeFilterChange() {
+    const selectedFilter = document.getElementById('time-filter').value;
+    const data = dashboardData[selectedFilter];
+
+    // Push stored values into the input boxes
+    document.getElementById('input-male').value = data.male;
+    document.getElementById('input-female').value = data.female;
+    document.getElementById('input-absent').value = data.absentDays;
+    document.getElementById('input-multiplier').value = data.shiftLength;
+
+    // Run the calculation engine
+    calculateMetrics();
+  }
+
+  // Runs if a user manually edits the input boxes/slider while on a filter
+  function updateCurrentDataAndCalculate() {
+    const selectedFilter = document.getElementById('time-filter').value;
+    
+    // Save the new manual value back to our data store
+    dashboardData[selectedFilter] = {
+      male: parseInt(document.getElementById('input-male').value) || 0,
+      female: parseInt(document.getElementById('input-female').value) || 0,
+      absentDays: parseInt(document.getElementById('input-absent').value) || 0,
+      shiftLength: parseInt(document.getElementById('input-multiplier').value) || 8
+    };
+
+    calculateMetrics();
+  }
+
+  // Calculation and UI update engine
+  function calculateMetrics() {
+    // 1. Fetch values from inputs
+    const male = parseInt(document.getElementById('input-male').value) || 0;
+    const female = parseInt(document.getElementById('input-female').value) || 0;
+    const absentDays = parseInt(document.getElementById('input-absent').value) || 0;
+    const shiftLength = parseInt(document.getElementById('input-multiplier').value) || 8;
+
+    // 2. Perform Calculations
+    const totalHeadcount = male + female;
+    
+    let maleRatio = 0;
+    let femaleRatio = 0;
+    if (totalHeadcount > 0) {
+      maleRatio = Math.round((male / totalHeadcount) * 100);
+      femaleRatio = Math.round((female / totalHeadcount) * 100);
+    }
+
+    const estimatedManHours = totalHeadcount * shiftLength;
+    const absenteeHoursLost = absentDays * shiftLength;
+    const lostManHours = absenteeHoursLost; // Can be adjusted if you add separate structural deficits
+
+    // 3. Update the UI Displays
+    document.getElementById('slider-value-display').innerText = `${shiftLength} Hours`;
+    document.getElementById('shift-length-text').innerText = `Shift Total (${shiftLength}h Avg)`;
+    document.getElementById('total-count-display').innerText = totalHeadcount;
+    document.getElementById('ratio-display').innerText = `${maleRatio}% M / ${femaleRatio}% F`;
+    document.getElementById('man-hours-display').innerText = `${estimatedManHours}h`;
+    document.getElementById('absent-hours-display').innerText = `${absenteeHoursLost}h`;
+    document.getElementById('lost-hours-display').innerText = `${lostManHours}h`;
+  }
+
+  // Initialize the dashboard layout on window load
+  window.onload = function() {
+    calculateMetrics();
+  };
+</script>
+
 
  <!-- Performance Analytics Section -->
  <div class="metric-card" style="min-height: auto; gap: 16px;">
