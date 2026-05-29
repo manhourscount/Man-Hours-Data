@@ -364,26 +364,11 @@
   </div>
 </div>
 
-<script>
-  // Central data store holding parameters for every filter option
-  const dashboardData = {
-    'LIVE': { male: 223, female: 228, absentDays: 0, shiftLength: 8 },
-    'MTD':  { male: 210, female: 215, absentDays: 5, shiftLength: 8 },
-    'YTD':  { male: 195, female: 200, absentDays: 45, shiftLength: 8 },
-    'M-0':  { male: 180, female: 190, absentDays: 12, shiftLength: 8 }, // Jan
-    'M-1':  { male: 185, female: 192, absentDays: 8,  shiftLength: 8 }, // Feb
-    'M-2':  { male: 190, female: 195, absentDays: 10, shiftLength: 8 }, // Mar
-    'M-3':  { male: 200, female: 210, absentDays: 6,  shiftLength: 8 }, // Apr
-    'M-4':  { male: 223, female: 228, absentDays: 4,  shiftLength: 8 }, // May
-    'M-5':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Jun
-    'M-6':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Jul
-    'M-7':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Aug
-    'M-8':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Sep
-    'M-9':  { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Oct
-    'M-10': { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }, // Nov
-    'M-11': { male: 0,   female: 0,   absentDays: 0,  shiftLength: 8 }  // Dec
-  };
+<!-- 1. Load the data configuration file first -->
+<script src="data.js"></script>
 
+<!-- 2. Main logic application file -->
+<script>
   // Runs automatically when the dropdown changes
   function handleTimeFilterChange() {
     const selectedFilter = document.getElementById('time-filter').value;
@@ -416,13 +401,11 @@
 
   // Calculation and UI update engine
   function calculateMetrics() {
-    // 1. Fetch values from inputs
     const male = parseInt(document.getElementById('input-male').value) || 0;
     const female = parseInt(document.getElementById('input-female').value) || 0;
     const absentDays = parseInt(document.getElementById('input-absent').value) || 0;
     const shiftLength = parseInt(document.getElementById('input-multiplier').value) || 8;
 
-    // 2. Perform Calculations
     const totalHeadcount = male + female;
     
     let maleRatio = 0;
@@ -434,9 +417,8 @@
 
     const estimatedManHours = totalHeadcount * shiftLength;
     const absenteeHoursLost = absentDays * shiftLength;
-    const lostManHours = absenteeHoursLost; // Can be adjusted if you add separate structural deficits
+    const lostManHours = absenteeHoursLost;
 
-    // 3. Update the UI Displays
     document.getElementById('slider-value-display').innerText = `${shiftLength} Hours`;
     document.getElementById('shift-length-text').innerText = `Shift Total (${shiftLength}h Avg)`;
     document.getElementById('total-count-display').innerText = totalHeadcount;
@@ -446,13 +428,12 @@
     document.getElementById('lost-hours-display').innerText = `${lostManHours}h`;
   }
 
-  // Initialize the dashboard layout on window load
+  // Initialize layout components on window load
   window.onload = function() {
     calculateMetrics();
   };
 </script>
-
-
+  
  <!-- Performance Analytics Section -->
  <div class="metric-card" style="min-height: auto; gap: 16px;">
   <div class="card-label">Performance Analytics Visualizations</div>
