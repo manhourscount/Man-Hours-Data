@@ -209,10 +209,10 @@ function exportMetrics() {
  let workbookOutput = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org">
  <head><style>
  td { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11pt; padding: 6px; }
- .title-header { background-color: #0f766e; color: #ffffff; font-size: 14pt; font-weight: bold; text-align: center; padding: 12px; border-bottom: 2px solid #115e59; }
+ .title-header { background-color: #0f766e; color: #ffffff; font-size: 14pt; font-weight: bold; text-align: center; padding: 12px; height: 62px; border-bottom: 2px solid #115e59; }
  .meta-left { background-color: #f1f5f9; color: #475569; font-size: 10pt; font-style: italic; border-bottom: 1px solid #cbd5e1; }
  .meta-right { background-color: #f1f5f9; color: #0f766e; font-size: 10pt; font-weight: bold; text-align: right; border-bottom: 1px solid #cbd5e1; }
- .section-header { background-color: #115e59; color: #ffffff; font-weight: bold; font-size: 11pt; text-align: center; padding: 8px; }
+ .section-header { background-color: #115e59; color: #ffffff; font-weight: bold; font-size: 11pt; text-align: center; padding: 8px; height: 42px;}
  .label-col { background-color: #f8fafc; color: #334155; width: 447px; border-left: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
  .value-col { text-align: right; font-weight: bold; color: #0f172a; width: 425px; border-left: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
  .metric-high { color: #0d9488; background-color: #ccfbf1; text-align: right; font-weight: bold; border: 1px solid #99f6e4; }
