@@ -8,7 +8,7 @@ import { getDatabase, ref, onValue, set } from "https://gstatic.com";
 const firebaseConfig = {
   apiKey: "AIzaSyA8IQoTkkV_rCW8GpHYxH9-NRT0jnLRqhs",
   authDomain: "://firebaseapp.com",
-  databaseURL: "https://firebasedatabase.app",
+  databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "man-hours-data",
   storageBucket: "man-hours-data.firebasestorage.app",
   messagingSenderId: "72349451353",
