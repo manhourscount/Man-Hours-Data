@@ -10,7 +10,6 @@
   messagingSenderId: "72349451353",
   appId: "1:72349451353:web:7d7dce29a6d9ba6c44dd48",
   measurementId: "G-XN3ZB7PXP6"
- databaseURL: "https://man-hours-data-default-rtdb.asia-southeast1.firebasedatabase.app/" 
 };
 // Initialize Firebase using the global window variables
 firebase.initializeApp(firebaseConfig);
